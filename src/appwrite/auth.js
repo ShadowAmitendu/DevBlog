@@ -2,15 +2,63 @@ import { Client, Account, ID } from "appwrite";
 import conf from "../conf/conf.js";
 
 /**
+ * Custom error class for authentication service errors.
+ * @class AuthServiceError
+ * @extends Error
+ */
+class AuthServiceError extends Error {
+	/**
+	 * @param {string} method - The method where the error occurred
+	 * @param {string} message - The error message
+	 * @param {Error} [originalError] - The original error that was caught
+	 */
+	constructor(method, message, originalError = null) {
+		super(message);
+		this.name = "AuthServiceError";
+		this.method = method;
+		this.originalError = originalError;
+		this.code = originalError?.code || null;
+		this.timestamp = new Date().toISOString();
+	}
+}
+
+/**
+ * Handles and logs errors consistently across the auth service.
+ * @param {string} method - The method name where error occurred
+ * @param {Error} error - The caught error
+ * @param {Object} [context={}] - Additional context about the operation (avoid sensitive data)
+ * @returns {AuthServiceError} The formatted error
+ */
+const handleError = (method, error, context = {}) => {
+	const errorMessage = error?.message || "Unknown error occurred";
+	const errorCode = error?.code || "UNKNOWN";
+
+	console.error(`[AuthService] ${method} failed`, {
+		errorCode,
+		errorMessage,
+		context,
+		timestamp: new Date().toISOString(),
+	});
+
+	return new AuthServiceError(method, errorMessage, error);
+};
+
+/**
  * AuthService class handles all authentication operations using Appwrite.
  * Provides methods for user registration, login, session management, and logout.
+ *
+ * @class AuthService
  */
 export class AuthService {
+	/** @type {Client} */
 	client = new Client();
+
+	/** @type {Account} */
 	account;
 
 	/**
 	 * Initializes the Appwrite client with endpoint and project configuration.
+	 * @constructor
 	 */
 	constructor() {
 		this.client
@@ -22,12 +70,14 @@ export class AuthService {
 
 	/**
 	 * Creates a new user account and automatically logs them in.
-	 * @param {Object} params - The account creation parameters.
-	 * @param {string} params.name - The user's display name.
-	 * @param {string} params.email - The user's email address.
-	 * @param {string} params.password - The user's password (min 8 characters).
-	 * @returns {Promise<Object>} The session object if successful.
-	 * @throws {Error} If account creation fails.
+	 *
+	 * @async
+	 * @param {Object} params - The account creation parameters
+	 * @param {string} params.name - The user's display name
+	 * @param {string} params.email - The user's email address
+	 * @param {string} params.password - The user's password (min 8 characters)
+	 * @returns {Promise<Object|null>} The session object if successful, null if creation fails
+	 * @throws {AuthServiceError} If account creation fails critically
 	 */
 	async createAccount({ name, email, password }) {
 		try {
@@ -40,60 +90,70 @@ export class AuthService {
 
 			if (userAccount) {
 				return await this.login({ email, password });
-			} else {
-				console.log("ERROR OCCURED");
-				return userAccount;
 			}
+			return null;
 		} catch (error) {
-			console.log("APPWRITE ERROR :: createAccount :: ERROR ->", error);
-			throw error;
+			const authError = handleError("createAccount", error, { email, name });
+			throw authError;
 		}
 	}
 
 	/**
 	 * Logs in a user with email and password.
-	 * @param {Object} params - The login parameters.
-	 * @param {string} params.email - The user's email address.
-	 * @param {string} params.password - The user's password.
-	 * @returns {Promise<Object>} The session object if successful.
-	 * @throws {Error} If login fails.
+	 *
+	 * @async
+	 * @param {Object} params - The login parameters
+	 * @param {string} params.email - The user's email address
+	 * @param {string} params.password - The user's password
+	 * @returns {Promise<Object|null>} The session object if successful, null if login fails
 	 */
 	async login({ email, password }) {
 		try {
 			return await this.account.createEmailPasswordSession({ email, password });
 		} catch (error) {
-			console.log("APPWRITE ERROR :: login :: ERROR ->", error);
+			handleError("login", error, { email });
+			return null;
 		}
-		return null;
 	}
 
 	/**
 	 * Retrieves the currently logged-in user's account details.
-	 * @returns {Promise<Object|null>} The user object if logged in, null otherwise.
+	 *
+	 * @async
+	 * @returns {Promise<Object|null>} The user object if logged in, null otherwise
 	 */
 	async getCurrentUser() {
 		try {
 			return await this.account.get();
 		} catch (error) {
-			console.log("APPWRITE ERROR :: getCurrentUser :: ERROR ->", error);
+			// Don't log as error for "not logged in" scenarios (expected behavior)
+			if (error?.code === 401) {
+				console.debug("[AuthService] No active session");
+			} else {
+				handleError("getCurrentUser", error);
+			}
+			return null;
 		}
-		return null;
 	}
 
 	/**
 	 * Logs out the user by deleting all their sessions.
-	 * @returns {Promise<Object|null>} The response object if successful, null otherwise.
+	 *
+	 * @async
+	 * @returns {Promise<boolean>} True if logout was successful, false otherwise
 	 */
 	async logout() {
 		try {
-			return await this.account.deleteSessions();
+			await this.account.deleteSessions();
+			return true;
 		} catch (error) {
-			console.log("APPWRITE ERROR :: logout :: ERROR ->", error);
+			handleError("logout", error);
+			return false;
 		}
-		return null;
 	}
 }
 
+/** @type {AuthService} */
 const authService = new AuthService();
 
 export default authService;

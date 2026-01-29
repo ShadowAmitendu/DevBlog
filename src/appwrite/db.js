@@ -1,58 +1,273 @@
-import { Client, ID, Databases, Query, Storage } from "appwrite";
+import { Client, ID, TablesDB, Query, Storage } from "appwrite";
 import conf from "../conf/conf.js";
 
+/**
+ * Custom error class for database service errors.
+ * @class DatabaseServiceError
+ * @extends Error
+ */
+class DatabaseServiceError extends Error {
+	/**
+	 * @param {string} method - The method where the error occurred
+	 * @param {string} message - The error message
+	 * @param {Error} [originalError] - The original error that was caught
+	 */
+	constructor(method, message, originalError = null) {
+		super(message);
+		this.name = "DatabaseServiceError";
+		this.method = method;
+		this.originalError = originalError;
+		this.code = originalError?.code || null;
+		this.timestamp = new Date().toISOString();
+	}
+}
+
+/**
+ * Handles and logs errors consistently across the service.
+ * @param {string} method - The method name where error occurred
+ * @param {Error} error - The caught error
+ * @param {Object} [context={}] - Additional context about the operation
+ * @returns {DatabaseServiceError} The formatted error
+ */
+const handleError = (method, error, context = {}) => {
+	const errorMessage = error?.message || "Unknown error occurred";
+	const errorCode = error?.code || "UNKNOWN";
+
+	console.error(`[DatabaseService] ${method} failed`, {
+		errorCode,
+		errorMessage,
+		context,
+		timestamp: new Date().toISOString(),
+	});
+
+	return new DatabaseServiceError(method, errorMessage, error);
+};
+
+/**
+ * @typedef {Object} BlogData
+ * @property {string} title - The title of the blog post
+ * @property {string} slug - The unique slug/identifier for the blog post
+ * @property {string} content - The main content of the blog post
+ * @property {string} featuredImage - The file ID of the featured image
+ * @property {string} status - The publication status ('active' or 'inactive')
+ * @property {string} userId - The ID of the user who created the blog
+ */
+
+/**
+ * Service class for interacting with Appwrite TablesDB and Storage.
+ * Provides methods for CRUD operations on blog posts and file management.
+ *
+ * @class DatabaseService
+ */
 export class DatabaseService {
+	/** @type {Client} */
 	client = new Client();
-	databases;
+
+	/** @type {TablesDB} */
+	tablesDB;
+
+	/** @type {Storage} */
 	bucket;
 
+	/**
+	 * Initializes the Appwrite client, TablesDB, and Storage services.
+	 * @constructor
+	 */
 	constructor() {
 		this.client
 			.setEndpoint(conf.appWriteURL)
 			.setProject(conf.appWriteProjectID);
-		this.databases = new Databases(this.client);
+		this.tablesDB = new TablesDB(this.client);
 		this.bucket = new Storage(this.client);
 	}
 
+	/**
+	 * Creates a new blog post in the database.
+	 *
+	 * @async
+	 * @param {Object} params - The blog post parameters
+	 * @param {string} params.title - The title of the blog post
+	 * @param {string} params.slug - The unique slug used as the row ID
+	 * @param {string} params.content - The main content of the blog post
+	 * @param {string} params.featuredImage - The file ID of the featured image
+	 * @param {string} params.status - The publication status ('active' or 'inactive')
+	 * @param {string} params.userId - The ID of the user creating the blog
+	 * @returns {Promise<Object|null>} The created blog row or null if creation fails
+	 */
 	async createBlog({ title, slug, content, featuredImage, status, userId }) {
 		try {
-			return await this.databases.createDocument(
-				conf.appWriteDatabaseID,
-				conf.appWriteCollectionID,
-				slug,
-				{
+			return await this.tablesDB.createRow({
+				databaseId: conf.appWriteDatabaseID,
+				tableId: conf.appWriteCollectionID,
+				rowId: slug,
+				data: {
 					title,
 					content,
 					featuredImage,
 					status,
 					userId,
 				},
-			);
+			});
 		} catch (error) {
-			console.log("APPWRITE ERROR :: createBlog :: ERROR ->", error);
+			handleError("createBlog", error, { slug, title, userId });
+			return null;
 		}
-		return null;
 	}
 
-	async updateBlog(slug, { blogId, title, content, featuredImage, status }) {
+	/**
+	 * Updates an existing blog post in the database.
+	 *
+	 * @async
+	 * @param {string} slug - The unique slug/row ID of the blog to update
+	 * @param {Object} params - The blog post parameters to update
+	 * @param {string} params.title - The updated title
+	 * @param {string} params.content - The updated content
+	 * @param {string} params.featuredImage - The updated featured image file ID
+	 * @param {string} params.status - The updated publication status
+	 * @returns {Promise<Object|null>} The updated blog row or null if update fails
+	 */
+	async updateBlog(slug, { title, content, featuredImage, status }) {
 		try {
-			return await this.databases.update(
-				conf.appWriteDatabaseID,
-				conf.appWriteCollectionID,
-				slug,
-				{
+			return await this.tablesDB.updateRow({
+				databaseId: conf.appWriteDatabaseID,
+				tableId: conf.appWriteCollectionID,
+				rowId: slug,
+				data: {
 					title,
 					content,
 					featuredImage,
 					status,
 				},
-			);
+			});
 		} catch (error) {
-			console.log("APPWRITE ERROR :: updateBlog :: ERROR ->", error);
+			handleError("updateBlog", error, { slug, title });
+			return null;
 		}
 	}
-	async deleteBlog
+
+	/**
+	 * Deletes a blog post from the database.
+	 *
+	 * @async
+	 * @param {string} slug - The unique slug/row ID of the blog to delete
+	 * @returns {Promise<boolean>} True if deletion was successful, false otherwise
+	 */
+	async deleteBlog(slug) {
+		try {
+			await this.tablesDB.deleteRow({
+				databaseId: conf.appWriteDatabaseID,
+				tableId: conf.appWriteCollectionID,
+				rowId: slug,
+			});
+			return true;
+		} catch (error) {
+			handleError("deleteBlog", error, { slug });
+			return false;
+		}
+	}
+
+	/**
+	 * Retrieves a single blog post by its slug.
+	 *
+	 * @async
+	 * @param {string} slug - The unique slug/row ID of the blog to retrieve
+	 * @returns {Promise<Object|null>} The blog row data or null if retrieval fails
+	 */
+	async getBlog(slug) {
+		try {
+			return await this.tablesDB.getRow({
+				databaseId: conf.appWriteDatabaseID,
+				tableId: conf.appWriteCollectionID,
+				rowId: slug,
+			});
+		} catch (error) {
+			handleError("getBlog", error, { slug });
+			return null;
+		}
+	}
+
+	/**
+	 * Lists blog posts with optional query filters.
+	 *
+	 * @async
+	 * @param {string[]} [queries=[Query.equal("status", "active")]] - Array of query strings for filtering
+	 * @returns {Promise<Object|null>} Object containing rows array and total count, or null if listing fails
+	 */
+	async listBlogs(queries = [Query.equal("status", "active")]) {
+		try {
+			return await this.tablesDB.listRows({
+				databaseId: conf.appWriteDatabaseID,
+				tableId: conf.appWriteCollectionID,
+				queries,
+			});
+		} catch (error) {
+			handleError("listBlogs", error, { queries });
+			return null;
+		}
+	}
+
+	/**
+	 * Uploads a file to the Appwrite storage bucket.
+	 *
+	 * @async
+	 * @param {File} file - The file object to upload
+	 * @returns {Promise<Object|null>} The uploaded file object or null if upload fails
+	 */
+	async uploadFile(file) {
+		try {
+			return await this.bucket.createFile({
+				bucketId: conf.appWriteBucketID,
+				fileId: ID.unique(),
+				file,
+			});
+		} catch (error) {
+			handleError("uploadFile", error, {
+				fileName: file?.name,
+				fileSize: file?.size,
+			});
+			return null;
+		}
+	}
+
+	/**
+	 * Deletes a file from the Appwrite storage bucket.
+	 *
+	 * @async
+	 * @param {string} fileId - The ID of the file to delete
+	 * @returns {Promise<boolean>} True if deletion was successful, false otherwise
+	 */
+	async deleteFile(fileId) {
+		try {
+			await this.bucket.deleteFile({
+				bucketId: conf.appWriteBucketID,
+				fileId,
+			});
+			return true;
+		} catch (error) {
+			handleError("deleteFile", error, { fileId });
+			return false;
+		}
+	}
+
+	/**
+	 * Gets a preview URL for an image file.
+	 *
+	 * @param {string} fileId - The ID of the file to preview
+	 * @returns {URL|null} The preview URL or null if retrieval fails
+	 */
+	getFilePreview(fileId) {
+		try {
+			return this.bucket.getFilePreview({
+				bucketId: conf.appWriteBucketID,
+				fileId,
+			});
+		} catch (error) {
+			handleError("getFilePreview", error, { fileId });
+			return null;
+		}
+	}
 }
 
+/** @type {DatabaseService} */
 const databaseService = new DatabaseService();
 export default databaseService;
