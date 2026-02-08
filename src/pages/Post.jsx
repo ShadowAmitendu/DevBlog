@@ -115,86 +115,79 @@ export default function Post() {
           }
 
           body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            line-height: 1.7;
-            color: #2c3e50;
-            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.8;
+            color: #374151;
+            padding: 20px;
             margin: 0;
-            font-size: 16px;
+            font-size: 1.125rem;
+            background-color: #ffffff;
           }
 
           h1, h2, h3, h4, h5, h6 {
-            margin: 1.2em 0 0.6em;
-            font-weight: 700;
+            color: #111827;
+            margin: 2em 0 0.8em;
+            font-weight: 800;
             line-height: 1.3;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
+            letter-spacing: -0.025em;
           }
 
-          h1 { font-size: 2em; }
-          h2 { font-size: 1.5em; }
-          h3 { font-size: 1.25em; }
+          h1 { font-size: 2.25em; margin-top: 0; }
+          h2 { font-size: 1.75em; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.3em; }
+          h3 { font-size: 1.5em; }
 
-          p {
-            margin: 0.8em 0;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-          }
-
-          ul, ol {
-            margin: 0.8em 0;
-            padding-left: 2em;
-          }
-
-          li {
-            margin: 0.3em 0;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-          }
-
-          img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 1em 0;
-            border-radius: 4px;
-          }
+          p { margin: 1.25em 0; }
 
           a {
-            color: #2980b9;
-            text-decoration: underline;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
+            color: #2563eb;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
           }
+          a:hover { border-bottom-color: #2563eb; }
 
-          a:hover {
-            color: #1a5490;
-          }
-
-          pre {
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-            background: #f5f5f5;
-            padding: 1em;
-            border-radius: 4px;
-            margin: 1em 0;
+          img {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin: 2em auto;
           }
 
           code {
-            background: #f5f5f5;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
+            background-color: #f3f4f6;
+            color: #ec4899;
+            padding: 0.25rem 0.375rem;
+            border-radius: 0.375rem;
+            font-size: 0.875em;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          }
+
+          pre {
+            background-color: #1f2937;
+            color: #f3f4f6;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5em 0;
+          }
+          pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
           }
 
           blockquote {
-            border-left: 4px solid #ddd;
-            padding-left: 1em;
-            margin: 1em 0;
-            color: #666;
             font-style: italic;
+            border-left: 4px solid #e5e7eb;
+            padding-left: 1.5em;
+            margin: 1.5em 0;
+            color: #4b5563;
           }
+
+          ul, ol { padding-left: 1.5em; margin: 1.25em 0; }
+          li { margin: 0.5em 0; padding-left: 0.3em; }
+          li::marker { color: #9ca3af; }
+
 
           table {
             border-collapse: collapse;
