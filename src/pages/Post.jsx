@@ -45,7 +45,7 @@ export default function Post() {
 					<img
 						src={appwriteService.getFileView(post.featuredImage)}
 						alt={post.title}
-						className="w-full max-h-[500px] object-cover"
+						className="w-full max-h-125 object-cover"
 					/>
 
 					{isAuthor && (

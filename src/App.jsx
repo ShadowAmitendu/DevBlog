@@ -55,7 +55,7 @@ function App() {
 			<Header />
 
 			{/* flex-grow: pushes the footer down by taking all available space */}
-			<main className="flex-grow">
+			<main className="grow">
 				<Outlet />
 			</main>
 
