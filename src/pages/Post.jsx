@@ -225,7 +225,7 @@ export default function Post() {
 					{/* Featured Image */}
 					<div className="mb-8 rounded-xl overflow-hidden shadow-lg">
 						<img
-							src={appwriteService.getFilePreview(post.featuredImage)}
+							src={appwriteService.getFileView(post.featuredImage)}
 							alt={post.title}
 							className="w-full h-auto object-cover"
 						/>
