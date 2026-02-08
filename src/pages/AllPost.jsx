@@ -1,3 +1,8 @@
+/**
+ * File: src/pages/AllPost.jsx
+ * Description: Page that lists all posts, used for the 'All Posts' view.
+ */
+
 import React, { useState, useEffect } from "react";
 import { Container, PostCard } from "../components";
 import appwriteService from "../appwrite/config";

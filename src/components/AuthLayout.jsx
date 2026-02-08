@@ -1,3 +1,9 @@
+/**
+ * File: src/components/AuthLayout.jsx
+ * Description: Route protection / auth layout component. Redirects based on
+ * authentication state and renders a loading skeleton while checking auth.
+ */
+
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";

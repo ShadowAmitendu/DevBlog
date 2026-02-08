@@ -1,3 +1,8 @@
+/**
+ * File: src/pages/AddPost.jsx
+ * Description: Page that renders the PostForm for creating a new blog post.
+ */
+
 import React from "react";
 import { Container, PostForm } from "../components";
 import useDocTitle from "../hooks/useDocTitle";

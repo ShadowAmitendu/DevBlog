@@ -1,3 +1,8 @@
+/**
+ * File: src/pages/NotFound.jsx
+ * Description: 404 page shown for unknown routes. Provides link back to home.
+ */
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Container } from "../components";

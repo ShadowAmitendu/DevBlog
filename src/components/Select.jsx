@@ -1,3 +1,9 @@
+/**
+ * File: src/components/Select.jsx
+ * Description: Custom styled select component following the 2D flat UI. Wraps
+ * a native select and provides a custom arrow indicator.
+ */
+
 import React, { useId } from "react";
 
 function Select({ options, label, className = "", ...props }, ref) {

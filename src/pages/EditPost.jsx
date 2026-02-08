@@ -1,3 +1,9 @@
+/**
+ * File: src/pages/EditPost.jsx
+ * Description: Page for editing an existing blog post. Loads post data and
+ * renders PostForm in edit mode.
+ */
+
 import React, { useEffect, useState } from "react";
 import { Container, PostForm } from "../components";
 import appwriteService from "../appwrite/config";

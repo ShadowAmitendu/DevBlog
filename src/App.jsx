@@ -1,3 +1,9 @@
+/**
+ * File: src/App.jsx
+ * Description: Root application layout. Responsible for initial user check,
+ * header/footer layout and rendering child routes via Outlet.
+ */
+
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import authService from "./appwrite/auth";

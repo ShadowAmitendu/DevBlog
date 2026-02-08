@@ -1,3 +1,8 @@
+/**
+ * File: src/pages/Home.jsx
+ * Description: Home page listing recent posts and featured content.
+ */
+
 import React, { useEffect, useState } from "react";
 import appwriteService from "../appwrite/config";
 import { Container, PostCard } from "../components";
