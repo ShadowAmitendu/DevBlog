@@ -102,7 +102,7 @@ export default function Post() {
             line-height: 1.6;
             color: #2c3e50;
             background-color: transparent;
-            font-size: clamp(14px, 4vw, 1.1rem);
+            font-size: clamp(13px, 3.5vw, 1rem);
             overflow: hidden;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -112,7 +112,7 @@ export default function Post() {
             margin: 0;
           }
           p {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             word-wrap: break-word;
             overflow-wrap: break-word;
             word-break: break-word;
@@ -121,24 +121,24 @@ export default function Post() {
             color: #2c3e50;
             text-transform: uppercase;
             font-weight: 900;
-            margin: 1.5rem 0 0.8rem;
-            letter-spacing: -0.02em;
+            margin: 1.2rem 0 0.6rem;
+            letter-spacing: -0.015em;
             word-wrap: break-word;
             overflow-wrap: break-word;
             word-break: break-word;
-            font-size: clamp(1.2rem, 5vw, 2rem);
+            font-size: clamp(0.9rem, 3.5vw, 1.8rem);
           }
-          h1 { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+          h1 { font-size: clamp(1rem, 4vw, 2rem); }
           h2 {
             border-left: 8px solid #2980b9;
-            padding-left: 0.8rem;
-            font-size: clamp(1.25rem, 5vw, 1.8rem);
+            padding-left: 0.6rem;
+            font-size: clamp(0.95rem, 3.5vw, 1.5rem);
           }
-          h3 { font-size: clamp(1.1rem, 4.5vw, 1.5rem); }
+          h3 { font-size: clamp(0.9rem, 3vw, 1.3rem); }
           img {
             border: 4px solid #2c3e50;
             display: block;
-            margin: 2rem auto;
+            margin: 1.2rem auto;
             max-width: 100%;
             width: 100%;
             height: auto;
@@ -146,8 +146,8 @@ export default function Post() {
           blockquote {
             background: #ecf0f1;
             border: 2px solid #2c3e50;
-            padding: 1rem;
-            margin: 1.5rem 0;
+            padding: 0.8rem;
+            margin: 1rem 0;
             font-weight: bold;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -182,13 +182,13 @@ export default function Post() {
             word-break: break-word;
           }
           ul, ol {
-            margin: 1.2rem 0;
-            padding-left: 1.5rem;
+            margin: 1rem 0;
+            padding-left: 1.2rem;
             overflow-wrap: break-word;
             word-wrap: break-word;
           }
           li {
-            margin: 0.3rem 0;
+            margin: 0.2rem 0;
             overflow-wrap: break-word;
             word-wrap: break-word;
             word-break: break-word;
@@ -218,15 +218,15 @@ export default function Post() {
 					</div>
 
 					{/* Author & Header Block */}
-					<div className="bg-white border-4 border-[#2c3e50] p-8 mb-8 shadow-[8px_8px_0px_0px_rgba(44,62,80,1)]">
-						<h1 className="text-5xl font-black uppercase tracking-tighter text-[#2c3e50] leading-none mb-4">
+					<div className="bg-white border-4 border-[#2c3e50] p-4 md:p-6 mb-8 shadow-[8px_8px_0px_0px_rgba(44,62,80,1)]">
+						<h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-[#2c3e50] leading-tight mb-3">
 							{post.title}
 						</h1>
 						<div className="flex items-center gap-2">
-							<span className="bg-[#2980b9] text-white text-[10px] font-black px-2 py-1 uppercase">
+							<span className="bg-[#2980b9] text-white text-[9px] md:text-[10px] font-black px-2 py-1 uppercase">
 								Author
 							</span>
-							<span className="font-bold text-[#2c3e50] uppercase text-sm tracking-widest">
+							<span className="font-bold text-[#2c3e50] uppercase text-xs md:text-sm tracking-wide">
 								{post.authorName || (isAuthor && userData?.name) || "Anonymous"}
 							</span>
 						</div>
