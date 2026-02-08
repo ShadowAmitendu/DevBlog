@@ -127,7 +127,6 @@ export default function PostForm({ post }) {
 					const dbPost = await appwriteService.createBlog({
 						...data,
 						userId: userData.$id,
-						authorName: userData.name || "Anonymous",
 					});
 
 					if (dbPost) {

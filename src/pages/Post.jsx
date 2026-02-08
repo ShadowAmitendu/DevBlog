@@ -70,7 +70,7 @@ export default function Post() {
 					<p className="mt-2 text-sm font-bold text-[#7f8c8d] uppercase tracking-wide">
 						By{" "}
 						<span className="text-[#2980b9]">
-							{post.authorName || "Anonymous"}
+							{isAuthor && userData?.name ? userData.name : "A Dev"}
 						</span>
 					</p>
 					<div className="h-2 w-24 bg-[#2980b9] mt-4"></div>
