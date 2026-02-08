@@ -1,3 +1,9 @@
+/**
+ * File: src/store/authSlice.js
+ * Description: Redux slice managing authentication state (userData, status),
+ * including actions to set and clear authenticated user information.
+ */
+
 import { createSlice } from "@reduxjs/toolkit";
 
 /**
@@ -12,14 +18,14 @@ import { createSlice } from "@reduxjs/toolkit";
 
 /**
  * @typedef {Object} AuthState
- * @property {boolean} isAuthenticated - Whether the user is currently logged in
- * @property {User|null} user - The current user's data or null if not logged in
+ * @property {boolean} status - Whether the user is currently logged in
+ * @property {User|null} userData - The current user's data or null if not logged in
  */
 
 /** @type {AuthState} */
 const initialState = {
-	isAuthenticated: false,
-	user: null,
+	status: false,
+	userData: null,
 };
 
 /**
@@ -35,11 +41,11 @@ const authSlice = createSlice({
 		 * @param {AuthState} state - The current auth state
 		 * @param {Object} action - The action object
 		 * @param {Object} action.payload - The payload containing user data
-		 * @param {User} action.payload.user - The authenticated user's data
+		 * @param {User} action.payload.userData - The authenticated user's data
 		 */
 		login: (state, action) => {
-			state.isAuthenticated = true;
-			state.user = action.payload.user;
+			state.status = true;
+			state.userData = action.payload;
 		},
 
 		/**
@@ -47,8 +53,8 @@ const authSlice = createSlice({
 		 * @param {AuthState} state - The current auth state
 		 */
 		logout: (state) => {
-			state.isAuthenticated = false;
-			state.user = null;
+			state.status = false;
+			state.userData = null;
 		},
 	},
 });

@@ -1,5 +1,12 @@
-import { Client, Account, ID } from "appwrite";
-import conf from "../conf/conf.js";
+/**
+ * File: src/appwrite/auth.js
+ * Description: Authentication helper wrapping Appwrite Account operations
+ * (createAccount, login, logout, getCurrentUser). Returns normalized errors
+ * and uses the shared client instance.
+ */
+
+import { Account, ID } from "appwrite";
+import client from "./client.js";
 
 /**
  * Custom error class for authentication service errors.
@@ -50,22 +57,15 @@ const handleError = (method, error, context = {}) => {
  * @class AuthService
  */
 export class AuthService {
-	/** @type {Client} */
-	client = new Client();
-
 	/** @type {Account} */
 	account;
 
 	/**
-	 * Initializes the Appwrite client with endpoint and project configuration.
+	 * Initializes the Account service with the shared client instance.
 	 * @constructor
 	 */
 	constructor() {
-		this.client
-			.setEndpoint(conf.appWriteURL)
-			.setProject(conf.appWriteProjectID);
-
-		this.account = new Account(this.client);
+		this.account = new Account(client);
 	}
 
 	/**

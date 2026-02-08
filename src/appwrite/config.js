@@ -1,4 +1,12 @@
-import { Client, ID, TablesDB, Query, Storage } from "appwrite";
+/**
+ * File: src/appwrite/config.js
+ * Description: Appwrite wrapper providing database and storage helper methods
+ * (createBlog, updateBlog, uploadFile, deleteFile, etc.). Centralizes error
+ * handling and maps app logic to Appwrite SDK calls.
+ */
+
+import { ID, Databases, Query, Storage } from "appwrite";
+import client from "./client.js";
 import conf from "../conf/conf.js";
 
 /**
@@ -54,31 +62,26 @@ const handleError = (method, error, context = {}) => {
  */
 
 /**
- * Service class for interacting with Appwrite TablesDB and Storage.
+ * Service class for interacting with Appwrite Databases and Storage.
  * Provides methods for CRUD operations on blog posts and file management.
  *
  * @class DatabaseService
  */
 export class DatabaseService {
-	/** @type {Client} */
-	client = new Client();
-
-	/** @type {TablesDB} */
-	tablesDB;
+	/** @type {Databases} */
+	databases;
 
 	/** @type {Storage} */
 	bucket;
 
 	/**
-	 * Initializes the Appwrite client, TablesDB, and Storage services.
+	 * Initializes Databases and Storage services with the shared client instance.
+	 * This ensures authenticated sessions are automatically included in all requests.
 	 * @constructor
 	 */
 	constructor() {
-		this.client
-			.setEndpoint(conf.appWriteURL)
-			.setProject(conf.appWriteProjectID);
-		this.tablesDB = new TablesDB(this.client);
-		this.bucket = new Storage(this.client);
+		this.databases = new Databases(client);
+		this.bucket = new Storage(client);
 	}
 
 	/**
@@ -87,25 +90,34 @@ export class DatabaseService {
 	 * @async
 	 * @param {Object} params - The blog post parameters
 	 * @param {string} params.title - The title of the blog post
-	 * @param {string} params.slug - The unique slug used as the row ID
+	 * @param {string} params.slug - The unique slug used as the document ID
 	 * @param {string} params.content - The main content of the blog post
 	 * @param {string} params.featuredImage - The file ID of the featured image
 	 * @param {string} params.status - The publication status ('active' or 'inactive')
 	 * @param {string} params.userId - The ID of the user creating the blog
-	 * @returns {Promise<Object|null>} The created blog row or null if creation fails
+	 * @returns {Promise<Object|null>} The created blog document or null if creation fails
 	 */
-	async createBlog({ title, slug, content, featuredImage, status, userId }) {
+	async createBlog({
+		title,
+		slug,
+		content,
+		featuredImage,
+		status,
+		userId,
+		authorName,
+	}) {
 		try {
-			return await this.tablesDB.createRow({
+			return await this.databases.createDocument({
 				databaseId: conf.appWriteDatabaseID,
-				tableId: conf.appWriteCollectionID,
-				rowId: slug,
+				collectionId: conf.appWriteCollectionID,
+				documentId: slug,
 				data: {
 					title,
 					content,
 					featuredImage,
 					status,
 					userId,
+					authorName: authorName || "Anonymous",
 				},
 			});
 		} catch (error) {
@@ -118,20 +130,20 @@ export class DatabaseService {
 	 * Updates an existing blog post in the database.
 	 *
 	 * @async
-	 * @param {string} slug - The unique slug/row ID of the blog to update
+	 * @param {string} slug - The unique slug/document ID of the blog to update
 	 * @param {Object} params - The blog post parameters to update
 	 * @param {string} params.title - The updated title
 	 * @param {string} params.content - The updated content
 	 * @param {string} params.featuredImage - The updated featured image file ID
 	 * @param {string} params.status - The updated publication status
-	 * @returns {Promise<Object|null>} The updated blog row or null if update fails
+	 * @returns {Promise<Object|null>} The updated blog document or null if update fails
 	 */
 	async updateBlog(slug, { title, content, featuredImage, status }) {
 		try {
-			return await this.tablesDB.updateRow({
+			return await this.databases.updateDocument({
 				databaseId: conf.appWriteDatabaseID,
-				tableId: conf.appWriteCollectionID,
-				rowId: slug,
+				collectionId: conf.appWriteCollectionID,
+				documentId: slug,
 				data: {
 					title,
 					content,
@@ -149,15 +161,15 @@ export class DatabaseService {
 	 * Deletes a blog post from the database.
 	 *
 	 * @async
-	 * @param {string} slug - The unique slug/row ID of the blog to delete
+	 * @param {string} slug - The unique slug/document ID of the blog to delete
 	 * @returns {Promise<boolean>} True if deletion was successful, false otherwise
 	 */
 	async deleteBlog(slug) {
 		try {
-			await this.tablesDB.deleteRow({
+			await this.databases.deleteDocument({
 				databaseId: conf.appWriteDatabaseID,
-				tableId: conf.appWriteCollectionID,
-				rowId: slug,
+				collectionId: conf.appWriteCollectionID,
+				documentId: slug,
 			});
 			return true;
 		} catch (error) {
@@ -170,15 +182,15 @@ export class DatabaseService {
 	 * Retrieves a single blog post by its slug.
 	 *
 	 * @async
-	 * @param {string} slug - The unique slug/row ID of the blog to retrieve
-	 * @returns {Promise<Object|null>} The blog row data or null if retrieval fails
+	 * @param {string} slug - The unique slug/document ID of the blog to retrieve
+	 * @returns {Promise<Object|null>} The blog document data or null if retrieval fails
 	 */
 	async getBlog(slug) {
 		try {
-			return await this.tablesDB.getRow({
+			return await this.databases.getDocument({
 				databaseId: conf.appWriteDatabaseID,
-				tableId: conf.appWriteCollectionID,
-				rowId: slug,
+				collectionId: conf.appWriteCollectionID,
+				documentId: slug,
 			});
 		} catch (error) {
 			handleError("getBlog", error, { slug });
@@ -191,13 +203,13 @@ export class DatabaseService {
 	 *
 	 * @async
 	 * @param {string[]} [queries=[Query.equal("status", "active")]] - Array of query strings for filtering
-	 * @returns {Promise<Object|null>} Object containing rows array and total count, or null if listing fails
+	 * @returns {Promise<Object|null>} Object containing documents array and total count, or null if listing fails
 	 */
 	async listBlogs(queries = [Query.equal("status", "active")]) {
 		try {
-			return await this.tablesDB.listRows({
+			return await this.databases.listDocuments({
 				databaseId: conf.appWriteDatabaseID,
-				tableId: conf.appWriteCollectionID,
+				collectionId: conf.appWriteCollectionID,
 				queries,
 			});
 		} catch (error) {
@@ -250,19 +262,19 @@ export class DatabaseService {
 	}
 
 	/**
-	 * Gets a preview URL for an image file.
+	 * Gets a view URL for a file to display in the browser.
 	 *
-	 * @param {string} fileId - The ID of the file to preview
-	 * @returns {URL|null} The preview URL or null if retrieval fails
+	 * @param {string} fileId - The ID of the file to view
+	 * @returns {URL|null} The view URL or null if retrieval fails
 	 */
-	getFilePreview(fileId) {
+	getFileView(fileId) {
 		try {
-			return this.bucket.getFilePreview({
+			return this.bucket.getFileView({
 				bucketId: conf.appWriteBucketID,
 				fileId,
 			});
 		} catch (error) {
-			handleError("getFilePreview", error, { fileId });
+			handleError("getFileView", error, { fileId });
 			return null;
 		}
 	}
