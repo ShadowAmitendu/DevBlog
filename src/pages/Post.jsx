@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import appwriteService from "../appwrite/config";
 import { Button, Container } from "../components";
@@ -76,9 +76,28 @@ export default function Post() {
 					<div className="h-2 w-24 bg-[#2980b9] mt-4"></div>
 				</div>
 
-				{/* Content */}
+				{/* Content: isolate author HTML in an iframe to avoid global CSS interference */}
 				<div className="bg-white border-4 border-[#2c3e50] p-8 shadow-[4px_4px_0px_0px_rgba(44,62,80,1)]">
-					<div className="blog-body">{parse(post.content)}</div>
+					<div className="w-full">
+						<iframe
+							ref={iframeRef}
+							title="post-content"
+							srcDoc={post.content}
+							className="w-full"
+							style={{ border: "none", width: "100%" }}
+							onLoad={() => {
+								try {
+									const doc = iframeRef.current?.contentWindow?.document;
+									if (doc) {
+										iframeRef.current.style.height =
+											doc.body.scrollHeight + "px";
+									}
+								} catch (e) {
+									// ignore cross-origin or timing errors
+								}
+							}}
+						/>
+					</div>
 				</div>
 			</Container>
 		</div>
