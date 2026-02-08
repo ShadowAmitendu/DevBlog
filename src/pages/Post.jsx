@@ -93,45 +93,111 @@ export default function Post() {
     <html>
       <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
+          html { width: 100%; height: 100%; }
           body {
-            font-family: sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             line-height: 1.6;
             color: #2c3e50;
             background-color: transparent;
-            font-size: 1.1rem;
+            font-size: clamp(14px, 4vw, 1.1rem);
+            overflow: hidden;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            width: 100%;
+            padding: 0;
+            margin: 0;
           }
-          p { margin-bottom: 1.5rem; }
+          p {
+            margin-bottom: 1.5rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+          }
           h1, h2, h3 {
             color: #2c3e50;
             text-transform: uppercase;
             font-weight: 900;
-            margin: 2rem 0 1rem;
+            margin: 1.5rem 0 0.8rem;
             letter-spacing: -0.02em;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            font-size: clamp(1.2rem, 5vw, 2rem);
           }
-          h2 { border-left: 8px solid #2980b9; padding-left: 1rem; }
+          h1 { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+          h2 {
+            border-left: 8px solid #2980b9;
+            padding-left: 0.8rem;
+            font-size: clamp(1.25rem, 5vw, 1.8rem);
+          }
+          h3 { font-size: clamp(1.1rem, 4.5vw, 1.5rem); }
           img {
             border: 4px solid #2c3e50;
             display: block;
-            margin: 2rem 0;
+            margin: 2rem auto;
             max-width: 100%;
+            width: 100%;
+            height: auto;
           }
           blockquote {
             background: #ecf0f1;
             border: 2px solid #2c3e50;
-            padding: 1.5rem;
-            margin: 2rem 0;
+            padding: 1rem;
+            margin: 1.5rem 0;
             font-weight: bold;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
           }
-          code { background: #2c3e50; color: #ecf0f1; padding: 2px 6px; }
+          code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 2px 4px;
+            font-size: 0.9em;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+          }
           pre {
             background: #2c3e50;
             color: #ecf0f1;
-            padding: 1rem;
-            overflow-x: auto;
+            padding: 0.8rem;
+            overflow-x: hidden;
             border-bottom: 6px solid #2980b9;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
           }
+          a {
+            color: #2980b9;
+            text-decoration: underline;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+          }
+          ul, ol {
+            margin: 1.2rem 0;
+            padding-left: 1.5rem;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+          }
+          li {
+            margin: 0.3rem 0;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+          }
+          /* Text alignment (from react-quill) */
+          .ql-align-left { text-align: left; }
+          .ql-align-center { text-align: center; }
+          .ql-align-right { text-align: right; }
+          .ql-align-justify { text-align: justify; }
         </style>
       </head>
       <body>${post.content}</body>
@@ -191,7 +257,6 @@ export default function Post() {
 							className="w-full border-0"
 							style={{ width: "100%", display: "block", minHeight: "200px" }}
 							onLoad={handleIframeLoad}
-							sandbox="allow-same-origin"
 						/>
 					</div>
 				</div>

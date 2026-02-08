@@ -123,6 +123,7 @@ export default function PostForm({ post }) {
 				const dbPost = await appwriteService.updateBlog(post.$id, {
 					...data,
 					featuredImage: file ? file.$id : undefined,
+					authorName: post.authorName || userData.name || "Anonymous",
 				});
 
 				if (dbPost) {
@@ -166,7 +167,8 @@ export default function PostForm({ post }) {
 				.trim()
 				.toLowerCase()
 				.replace(/[^a-zA-Z\d\s]+/g, "-")
-				.replace(/\s/g, "-");
+				.replace(/\s/g, "-")
+				.slice(0, 36); // Appwrite documentId max 36 chars
 
 		return "";
 	}, []);

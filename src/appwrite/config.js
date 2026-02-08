@@ -138,7 +138,10 @@ export class DatabaseService {
 	 * @param {string} params.status - The updated publication status
 	 * @returns {Promise<Object|null>} The updated blog document or null if update fails
 	 */
-	async updateBlog(slug, { title, content, featuredImage, status }) {
+	async updateBlog(
+		slug,
+		{ title, content, featuredImage, status, authorName },
+	) {
 		try {
 			return await this.databases.updateDocument({
 				databaseId: conf.appWriteDatabaseID,
@@ -149,6 +152,7 @@ export class DatabaseService {
 					content,
 					featuredImage,
 					status,
+					authorName,
 				},
 			});
 		} catch (error) {
