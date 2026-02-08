@@ -97,7 +97,15 @@ export class DatabaseService {
 	 * @param {string} params.userId - The ID of the user creating the blog
 	 * @returns {Promise<Object|null>} The created blog document or null if creation fails
 	 */
-	async createBlog({ title, slug, content, featuredImage, status, userId }) {
+	async createBlog({
+		title,
+		slug,
+		content,
+		featuredImage,
+		status,
+		userId,
+		authorName,
+	}) {
 		try {
 			return await this.databases.createDocument({
 				databaseId: conf.appWriteDatabaseID,
@@ -109,6 +117,7 @@ export class DatabaseService {
 					featuredImage,
 					status,
 					userId,
+					authorName: authorName || "Anonymous",
 				},
 			});
 		} catch (error) {

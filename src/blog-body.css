@@ -1,0 +1,11 @@
+/* Minimal blog body — just padding and margin, no style overrides */
+.blog-body > * {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+.blog-body > *:first-child {
+	margin-top: 0;
+}
+.blog-body > *:last-child {
+	margin-bottom: 0;
+}

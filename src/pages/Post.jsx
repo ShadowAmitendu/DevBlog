@@ -70,7 +70,7 @@ export default function Post() {
 					<p className="mt-2 text-sm font-bold text-[#7f8c8d] uppercase tracking-wide">
 						By{" "}
 						<span className="text-[#2980b9]">
-							{isAuthor && userData?.name ? userData.name : "A Dev"}
+							{post.authorName || (isAuthor && userData?.name) || "Anonymous"}
 						</span>
 					</p>
 					<div className="h-2 w-24 bg-[#2980b9] mt-4"></div>
@@ -78,9 +78,7 @@ export default function Post() {
 
 				{/* Content */}
 				<div className="bg-white border-4 border-[#2c3e50] p-8 shadow-[4px_4px_0px_0px_rgba(44,62,80,1)]">
-					<div className="prose max-w-none text-[#2c3e50]">
-						{parse(post.content)}
-					</div>
+					<div className="blog-body">{parse(post.content)}</div>
 				</div>
 			</Container>
 		</div>

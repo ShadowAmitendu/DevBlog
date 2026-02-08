@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./blog-body.css";
 
 * {
 	font-family: Inter;
