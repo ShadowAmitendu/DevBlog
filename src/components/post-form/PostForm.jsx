@@ -102,9 +102,9 @@ export default function PostForm({ post }) {
 			return;
 		}
 
-		if (contentStr.length > 255) {
+		if (contentStr.length > 20000) {
 			setSubmitError(
-				"Content is too long (over 255 chars). Increase the Appwrite 'content' attribute size or shorten your post.",
+				"Content is too long (over 20,000 chars). Shorten your post to fit the limit.",
 			);
 			setSubmitting(false);
 			return;
