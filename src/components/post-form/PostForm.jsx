@@ -94,6 +94,22 @@ export default function PostForm({ post }) {
 		setSubmitting(true);
 		setSubmitError(null);
 
+		// Client-side validation: Appwrite `content` attribute is currently limited to 255 chars
+		const contentStr = data.content || "";
+		if (typeof contentStr !== "string") {
+			setSubmitError("Content must be plain text/HTML string.");
+			setSubmitting(false);
+			return;
+		}
+
+		if (contentStr.length > 255) {
+			setSubmitError(
+				"Content is too long (over 255 chars). Increase the Appwrite 'content' attribute size or shorten your post.",
+			);
+			setSubmitting(false);
+			return;
+		}
+
 		try {
 			if (post) {
 				const file = imageToUpload
